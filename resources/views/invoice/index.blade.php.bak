@@ -1,0 +1,160 @@
+@extends('layouts.app')
+@section('title', trans('general.pages.invoice.title'))
+@section('content')
+    <div id="content-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>@lang('general.pages.invoice.title')</h1>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-6">
+                    <!-- -->
+                    <div class="bg-white shadow-sm box-container">
+                        <label for="cont-consum-facturi"
+                               class="box-container__title mb-2">Cod client</label>
+                            <form method="POST" action="{{ route('users.changeLoc', auth()->user()->id) }}">
+                            {{ csrf_field() }}
+                            <input type="hidden" name="_method" value="PUT"/>
+                            <select class="custom-select" name="alege" id="cont-consum-facturi">
+                                @if(!empty(session('locationsAll')))
+                                    @foreach(session('locationsAll') as $location)
+                                        <option {{ $location['cod_client'] == auth()->user()->codes[0]['client_code'] ? 'selected' : '' }}
+                                                value="{{ $location['cod_client'] }}">{{ $location['cod_client'] }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </form>
+                        <div class="w-100 my-3"></div>
+                    </div>
+                    <!-- -->
+                    <div class="bg-white shadow-sm box-container">
+                        <label for="locatie-consum-facturi"
+                               class="box-container__title mb-2">@lang('labels.locations')</label>
+                        <form method="post" action="{{ route('invoice.history') }}">
+                            {{ csrf_field() }}
+                            <select class="custom-select" name="currentLocation" id="locatie-consum-facturi">
+
+				            @if(!empty($locations))
+                                	@foreach($locations as $location)
+                                    	<option {{ $location['cod_loc'] == $currentLocation['cod_loc'] ? 'selected' : '' }}
+                                            value="{{ $location['cod_loc'] }}">{{ $location['addr_text'] == '' ? $location['cod_loc']: $location['addr_text'] }}</option>
+                                	@endforeach
+				            @endif
+                            </select>
+                        </form>
+                        <div class="w-100 my-3"></div>
+                    </div>
+                </div>
+ <div class="col-6">
+                    <div class="bg-white shadow-sm box-container">
+                        <label for="locatie-consum-facturi"
+                               class="box-container__title mb-2">Sold curent:</label>
+                        <div class="w-100" style="margin-bottom: 29px !important;">{{ $sold }} RON</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+@if(session()->has('message'))
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <span> {{ session()->get('message') }} </span>
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-label="@lang('labels.close')">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
+                <div class="col-12">
+                    <div class="bg-white shadow-sm box-container">
+                        <label for="locatie-consum"
+                               class="box-container__title mb-2">@lang('general.pages.invoice.unpayed')</label>
+                        <div class="table-responsive">
+                            @if(!empty($unPayedInvoices))
+                                <form method="post" action="{{ route('invoice.pay') }}">
+                                    {{ csrf_field() }}
+                                    <table id="selectable-table" class="table table-actions" style="width:100%">
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>@lang('labels.nr')</th>
+                                            <th>@lang('labels.date')</th>
+                                            <th>@lang('labels.due_date')</th>
+                                            <th>@lang('labels.value')</th>
+                                            <th>@lang('labels.payed')</th>
+                                            <th>@lang('labels.rest')</th>
+                                            <th>@lang('labels.view')</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($unPayedInvoices as $invoice)
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="invoicePay" name="invoicePay[]"
+                                                           data-value="{{ $invoice['rest_icpl'] }}"
+                                                           value="{{ $invoice['numarfactura'] }}"/>
+                                                </td>
+                                                <td>{{ $invoice['numarfactura'] }}</td>
+                                                <td>{{ date('d.m.Y', strtotime($invoice['datafactura'])) }}</td>
+                                                <td>{{ date('d.m.Y', strtotime($invoice['scadenta'])) }}</td>
+                                                <td>{{ $invoice['valtotal'] }}</td>
+                                                <td>{{ $invoice['valtotal'] - $invoice['rest_icpl'] }}</td>
+                                                <td>{{ $invoice['rest_icpl'] }}</td>
+                                                <td>
+                                                    <a href="{{ route('invoice.single', $invoice['idfactura']) }}"
+                                                       class="hover-to-accent" title="Vezi factură">
+                                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                                    </a>
+                                                    @if(invoiceExists($invoice['numarfactura'], $invoice['datafactura']))
+                                                        <a target="_blank" class="hover-to-accent"
+                                                           title="Descarcă factura"
+                                                           href="{{ route('invoice.pdf', ['id' => str_replace('/', '', $invoice['numarfactura']), 'date' => date('dmY', strtotime($invoice['datafactura']))]) }}">
+                                                            <i class="far fa-file-pdf" aria-hidden="true"></i>
+                                                        </a>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                    <div class="paysafe">
+                                        <img style="max-height: 50px;" src="{{ asset('img/paylogo.jpg') }}"/>
+                                        <button type="submit"
+                                                data-no-pay="@lang('general.pages.invoice.select_invoice')"
+                                                data-pay="@lang('general.pages.invoice.pay')"
+                                                class="btn btn-primary d-table ml-auto mt-4 payInvoice"
+                                                disabled="disabled">
+                                            @lang('general.pages.invoice.select_invoice')
+                                        </button>
+                                    </div>
+                                </form>
+                            @else
+                                @lang('general.pages.invoice.no_unpayed_invoices')
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="bg-white shadow-sm box-container">
+                        <div class="box-container__title__w-filter">
+                            <h4>@lang('general.pages.invoice.history')</h4>
+                        </div>
+                        <div class="invoice-list">
+                            @include('invoice.partials.list')
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+@section('header')
+    <link href="{{ asset('css/bootstrap-datepicker.css') }}" rel="stylesheet">
+@endsection
+@section('footer')
+    <script src="{{ asset('js/range_dates.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-datepicker.ro.min.js') }}"></script>
+@endsection

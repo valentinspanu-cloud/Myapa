@@ -1,0 +1,160 @@
+@extends('layouts.app')
+@section('title', 'Panou de control')
+@section('content')
+    <div id="content-main">
+        <div class="container dashboard-boxes">
+            @if (session('message'))
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <span>{{ session('message') }}</span>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="@lang('labels.close')">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            @if (session('status'))
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <span>{{ session('status') }}</span>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="@lang('labels.close')">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            <div class="row">
+                @if(!isAdmin())
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/index.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.index')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.index')
+                            </h2>
+                            <a href="{{ route('index.list') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/facturi.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.invoices')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.invoices')
+                            </h2>
+                            <a href="{{ route('invoice.list') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/notificari.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.notifications')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.notifications')
+                            </h2>
+                            <a href="{{ route('notification.list') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/user.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.my_account')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.my_account')
+                            </h2>
+                            <a href="{{ route('user.account') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    @if(getPage(4))
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="bg-white shadow-sm dashboard-boxes__item">
+                                <div class="dashboard-boxes__item__icon">
+                                    <img src="{{ asset('img/icons/contact.svg') }}"
+                                         alt="@lang('labels.icon') {{ getPage(4)['title'] }}"/>
+                                </div>
+                                <h2 class="dashboard-boxes__item__title">
+                                    {{ getPage(4)['title'] }}
+                                </h2>
+                                <a href="{{ route('cms.view', getPage(4)['slug']) }}"
+                                   class="dashboard-boxes__item__link"></a>
+                            </div>
+                        </div>
+                    @endif
+                @else
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/multiple-users_b.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.users')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.users')
+                            </h2>
+                            <a href="{{ route('users') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/notificari.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.notifications')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.notifications')
+                            </h2>
+                            <a href="{{ route('notification.admin') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/sesizari.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.complaints')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.complaints')
+                            </h2>
+                            <a href="{{ route('complaints.admin') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/cms.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.cms')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title" style="text-align: center">
+                                @lang('general.pages.dashboard.cms')
+                            </h2>
+                            <a href="{{ route('cms') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="bg-white shadow-sm dashboard-boxes__item">
+                            <div class="dashboard-boxes__item__icon">
+                                <img src="{{ asset('img/icons/settings.svg') }}"
+                                     alt="@lang('labels.icon') @lang('general.pages.dashboard.settings')"/>
+                            </div>
+                            <h2 class="dashboard-boxes__item__title">
+                                @lang('general.pages.dashboard.settings')
+                            </h2>
+                            <a href="{{ route('settings.edit') }}" class="dashboard-boxes__item__link"></a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+@endsection

@@ -1,0 +1,31 @@
+[90m= [39m[34;4mApp\Models\User[39;24m {#8099
+    [34mid[39m: [35m1[39m,
+    [34mname[39m: [32m"[39m[32mAdministrator[39m[32m"[39m,
+    [34memail[39m: [32m"[39m[32madmin@aquaservtulcea.ro[39m[32m"[39m,
+    [34mstatus[39m: [34;4mApp\Models\UserStatus[39;24m {#8127
+      [34mid[39m: [35m1[39m,
+      [34mname[39m: [32m"[39m[32mActiv[39m[32m"[39m,
+      [34mdescription[39m: [36mnull[39m,
+      [34mcreated_at[39m: [32m"[39m[32m2019-11-25 14:03:42[39m[32m"[39m,
+      [34mupdated_at[39m: [32m"[39m[32m2019-11-25 14:03:42[39m[32m"[39m,
+    },
+    [34memail_verified_at[39m: [32m"[39m[32m2019-09-12 16:12:28[39m[32m"[39m,
+    #[33mpassword[39m: [32m"[39m\$[32m2y[39m\$[32m12[39m\$[32mzvk4Q42AwzGJJ72cPsZRGuuKVFUU3jHK50Nd7w0FSt.p7MdRRIPvO[39m[32m"[39m,
+    [34mnotify[39m: [35m1[39m,
+    #[33mremember_token[39m: [32m"[39m[32m20zaoGmeN1MkCPBPvLkYyuRqC7EYoAhkc1azXDENxIo13snGZBE0DmgOJaFN[39m[32m"[39m,
+    [34mcreated_at[39m: [32m"[39m[32m2019-09-12 16:12:28[39m[32m"[39m,
+    [34mupdated_at[39m: [32m"[39m[32m2026-06-05 10:31:31[39m[32m"[39m,
+    [34mphone[39m: [36mnull[39m,
+    [34mcategory[39m: [32m""[39m,
+    [34mnotify_sms[39m: [36mnull[39m,
+    [34mnotify_invoice[39m: [36mnull[39m,
+    [34mcodes[39m: [34;4mIlluminate\Database\Eloquent\Collection[39;24m {#8098
+      [34mall[39m: [],
+    },
+    [34mreceivedNotifications[39m: [34;4mIlluminate\Database\Eloquent\Collection[39;24m {#8105
+      [34mall[39m: [],
+    },
+    [34msectors[39m: [34;4mIlluminate\Database\Eloquent\Collection[39;24m {#8111
+      [34mall[39m: [],
+    },
+  }

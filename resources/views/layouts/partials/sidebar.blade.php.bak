@@ -1,0 +1,97 @@
+<div id="sidebar">
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {{ request()->route()->getName() == 'home' ? 'active' : '' }}" href="/">
+                    <img src="{{ asset('img/icons/nav/home.svg') }}"
+                         alt="@lang('labels.icon') @lang('general.pages.dashboard.home')"/>
+                    <span class="nav-link-text">@lang('general.pages.dashboard.home')</span>
+                </a>
+            </li>
+            @if(!isAdmin())
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'index.list' ? 'active' : '' }}"
+                       href="{{ route('index.list') }}">
+                        <img src="{{ asset('img/icons/nav/index.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.index')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.index')</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'invoice.list' ? 'active' : '' }}"
+                       href="{{ route('invoice.list') }}">
+                        <img src="{{ asset('img/icons/nav/facturi.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.invoices')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.invoices')</span>
+                    </a>
+                </li>
+                {{--<li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'complaints' ? 'active' : '' }}"
+                       href="{{ route('complaints') }}">
+                        <img src="{{ asset('img/icons/nav/sesizari.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.complaints')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.complaints')</span>
+                    </a>
+                </li>--}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'notifications' ? 'active' : '' }}"
+                       href="{{ route('notification.list') }}">
+                        <img src="{{ asset('img/icons/nav/notifications.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.notifications')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.notifications')</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'users' ? 'active' : '' }}"
+                       href="{{ route('user.account') }}">
+                        <img src="{{ asset('img/icons/nav/users.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.my_account')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.my_account')</span>
+                    </a>
+                </li>
+            @else
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'users' ? 'active' : '' }}"
+                       href="{{ route('users') }}">
+                        <img src="{{ asset('img/icons/nav/multiple-users.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.users')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.users')</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'notification.admin' ? 'active' : '' }}"
+                       href="{{ route('notification.admin') }}">
+                        <img src="{{ asset('img/icons/nav/notifications.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.notifications')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.notifications')</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'complaints.admin' ? 'active' : '' }}"
+                       href="{{ route('complaints.admin') }}">
+                        <img src="{{ asset('img/icons/nav/sesizari.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.complaints')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.complaints')</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'cms' ? 'active' : '' }}"
+                       href="{{ route('cms') }}">
+                        <img src="{{ asset('img/icons/nav/cms.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.cms')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.cms')</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->route()->getName() == 'settings' ? 'active' : '' }}"
+                       href="{{ route('settings.edit') }}">
+                        <img src="{{ asset('img/icons/nav/settings.svg') }}"
+                             alt="@lang('labels.icon') @lang('general.pages.dashboard.settings')"/>
+                        <span class="nav-link-text">@lang('general.pages.dashboard.settings')</span>
+                    </a>
+                </li>
+            @endif
+
+        </ul>
+    </nav>
+</div>

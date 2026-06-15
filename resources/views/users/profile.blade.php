@@ -1,0 +1,341 @@
+@extends('layouts.app')
+@section('title', 'Contul meu')
+@section('content')
+    <div id="content-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>@lang('general.pages.users.my_account_title')</h1>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="bg-white shadow-sm my-account">
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-cont-tab" data-toggle="tab"
+                                   href="#nav-cont" role="tab" aria-controls="nav-cont" aria-selected="true">
+                                    @lang('labels.account_info')
+                                </a>
+                                <a class="nav-item nav-link" id="nav-locatii-tab" data-toggle="tab"
+                                   href="#nav-locatii" role="tab" aria-controls="nav-locatii" aria-selected="false">
+                                    Coduri de client
+                                </a>
+                                <a class="nav-item nav-link" id="nav-adaugaLocatii-tab" data-toggle="tab"
+                                   href="#nav-adaugaLocatii" role="tab" aria-controls="nav-adaugaLocatii" aria-selected="false">
+                                   Adauga Cod de client
+                                </a>
+                                {{-- <a class="nav-item nav-link" id="nav-notificari-tab" data-toggle="tab"
+                                    href="#nav-notificari" role="tab" aria-controls="nav-notificari"
+                                    aria-selected="false">
+                                     @lang('labels.notify_config')
+                                 </a>--}}
+                            </div>
+                        </nav>
+                        <div class="tab-content box-container" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-cont" role="tabpanel"
+                                 aria-labelledby="nav-cont-tab">
+                                @if(session('success'))
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <span>{{ session('success') }}</span>
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="@lang('labels.close')">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                @endif
+                                @if(session('error'))
+                                    <div class="alert alert-danger alert-dismissible fade show">
+                                        <span> {{ session('error') }} </span>
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="@lang('labels.close')">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                @endif
+                                <form class="row" method="POST" action="{{ route('users.patch', auth()->user()->id) }}">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="_method" value="PUT"/>
+                                    <div class="col-12 col-md-12">
+                                        <div class="md-input-group">
+                                            <input type="text" id="email" name="email"
+                                                   placeholder="@lang('labels.email')"
+                                                   value="{{ auth()->user()->email }}"/>
+                                            <span class="highlight"></span>
+                                            <span class="bar"></span>
+                                            <label for="email">@lang('labels.email')</label>
+                                            @if ($errors->has('email'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('email') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-input-group">
+                                            <input type="text" id="phone" name="phone"
+                                                   placeholder="@lang('labels.phone')"
+                                                   value="{{ auth()->user()->phone }}"/>
+                                            <span class="highlight"></span>
+                                            <span class="bar"></span>
+                                            <label for="email">@lang('labels.phone')</label>
+                                            @if ($errors->has('phone'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('phone') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="pass-field-group">
+                                            <label for="confirm_old_pass" class="pass-label">@lang('labels.confirm_old_pass')</label>
+                                            <div class="password-input-wrap">
+                                                <input type="password" id="confirm_old_pass"
+                                                   name="confirm_old_pass" value="" autocomplete="off"/>
+                                                <button type="button" class="toggle-pass" data-target="confirm_old_pass"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                            @if ($errors->has('confirm_old_pass'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('confirm_old_pass') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-12">
+                                        <div class="custom-control custom-checkbox">
+                                            <input {{ $user->notify == 1 ? 'checked' : '' }} type="checkbox" id="notify"
+                                                   name="notify" value="1" class="custom-control-input"/>
+                                            <label class="custom-control-label"
+                                                   for="notify"> @lang('labels.notify')</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox">
+                                            <input {{ $user->notify_sms == 1 ? 'checked' : '' }} type="checkbox"
+                                                   id="notify_sms"
+                                                   name="notify_sms" value="1" class="custom-control-input"/>
+                                            <label class="custom-control-label"
+                                                   for="notify_sms"> @lang('labels.notify_sms')</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox">
+                                            <input {{ $user->notify_invoice == 1 ? 'checked' : '' }} type="checkbox"
+                                                   id="notify_invoice"
+                                                   name="notify_invoice" value="1" class="custom-control-input"/>
+                                            <label class="custom-control-label"
+                                                   for="notify_invoice"> @lang('labels.notify_invoice')</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 d-flex justify-content-end">
+                                        <button type="submit" name="save" value="1" class="btn btn-primary pull-right"
+                                                style="height:37px;">@lang('labels.save')</button>
+                                    </div>
+                                </form>
+                                <form class="row" method="POST" action="{{ route('users.patch', auth()->user()->id) }}">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="_method" value="PUT"/>
+                                    <div class="col-md-12">
+                                        <hr class="mt-5" style="width: 100%; margin-top: 50px;"/>
+                                    </div>
+                                    <p class="col-md-12 font-weight-500">Schimbare parola</p>
+                                    <div class="col-12 col-md-4">
+                                        <div class="pass-field-group">
+                                            <label for="old_pass" class="pass-label">@lang('labels.old_pass')</label>
+                                            <div class="password-input-wrap">
+                                                <input type="password" id="old_pass"
+                                                   name="old_pass" value="" autocomplete="off"/>
+                                                <button type="button" class="toggle-pass" data-target="old_pass"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                            @if ($errors->has('old_pass'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('old_pass') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="pass-field-group">
+                                            <label for="password" class="pass-label">@lang('labels.new_pass')</label>
+                                            <div class="password-input-wrap">
+                                                <input type="password" value="" id="password" name="password" autocomplete="off"/>
+                                                <button type="button" class="toggle-pass" data-target="password"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                            @if ($errors->has('password'))
+                                                <div class="invalid-feedback d-block">
+                                                    {!! $errors->first('password') !!}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="pass-field-group">
+                                            <label for="password_confirmation" class="pass-label">@lang('labels.confirm_new_pass')</label>
+                                            <div class="password-input-wrap">
+                                                <input type="password" value="" id="password_confirmation"
+                                                   name="password_confirmation" autocomplete="off"/>
+                                                <button type="button" class="toggle-pass" data-target="password_confirmation"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                            @if ($errors->has('password_confirmation'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('password_confirmation') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-3 d-flex justify-content-end">
+                                        <button type="submit" value="1" name="change"
+                                                class="btn btn-primary">@lang('labels.save')</button>
+                                    </div>
+                                </form>
+                                <hr class="mt-5"/>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="font-weight-500">Dezactivare cont</p>
+                                        <p style="font-size: 14px">@lang('general.pages.users.delete_confirm_body_3')</p>
+                                        <button data-toggle="modal" data-target="#delete-confirm-modal"
+                                                class="btn btn-outline-danger mt-4">Șterge cont
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-locatii" role="tabpanel"
+                                 aria-labelledby="nav-locatii-tab">
+                                <div class="table-responsive">
+                                    <table class="table" style="width:100%">
+                                        <thead>
+                                        <tr>
+                                            <th>@lang('labels.client_code')</th>
+                                            <th>@lang('labels.city')</th>
+                                            <th>@lang('labels.address')</th>
+                                            <th>Alege</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        @if(!empty($locationsAll))
+                                            @foreach($locationsAll as $location)
+                                                <tr>
+                                                    <td>{{ $location['cod_client'] }}</td>
+                                                    <td>{{ $location['addr_city_code'] }}</td>
+                                                    <td>{{ $location['addr_text'] }}</td>
+                                                    <td>@if($location['cod_client'] == $user['codes'][0]['client_code'])
+                                                            <button type="submit" disabled value="{{ $location['cod_client'] }}" name="alege"
+                                                                    class="btn btn-primary">Alege</button>
+                                                    @else
+                                                            <form class="row" method="POST" action="{{ route('users.changeLoc', auth()->user()->id) }}">
+                                                                {{ csrf_field() }}
+                                                                <input type="hidden" name="_method" value="PUT"/>
+                                                                <button type="submit" value="{{ $location['cod_client'] }}" name="alege"
+                                                                    class="btn btn-primary">Alege</button>
+                                                            </form>
+                                                        @endif
+                                                        </td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="nav-adaugaLocatii" role="tabpanel"
+                                 aria-labelledby="nav-adaugaLocatii-tab">
+                                @if(session('success'))
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <span>{{ session('success') }}</span>
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="@lang('labels.close')">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                @endif
+                                @if(session('error'))
+                                    <div class="alert alert-danger alert-dismissible fade show">
+                                        <span> {{ session('error') }} </span>
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="@lang('labels.close')">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                @endif
+                                <form class="row" method="POST" action="{{ route('users.addLocations', auth()->user()->id) }}">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="_method" value="PUT"/>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="md-input-group">
+                                            <input type="text" id="cod_client" name="cod_client"
+                                                   placeholder="@lang('labels.client_code')"
+                                                   value=""/>
+                                            <span class="highlight"></span>
+                                            <span class="bar"></span>
+                                            <label for="cod_client">@lang('labels.client_code')</label>
+                                            @if ($errors->has('client_code'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('client_code') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="md-input-group">
+                                            <input type="text" id="nr_contract" name="nr_contract"
+                                                   placeholder="@lang('labels.contract_nr')"
+                                                   value=""/>
+                                            <span class="highlight"></span>
+                                            <span class="bar"></span>
+                                            <label for="nr_contract">@lang('labels.contract_nr')</label>
+                                            @if ($errors->has('contract_nr'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('contract_nr') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-3 d-flex justify-content-end">
+                                        <button type="submit" value="1" name="saveLoc"
+                                                class="btn btn-primary">@lang('labels.save')</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {{--<div class="tab-pane fade" id="nav-notificari" role="tabpanel"
+                                 aria-labelledby="nav-notificari-tab">
+
+                            </div>--}}
+                        </div>
+                        <div class="modal fade" id="delete-confirm-modal" tabindex="-1" role="dialog"
+                             aria-labelledby="delete-confirm-modal-label" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"
+                                            id="delete-confirm-modal-label">@lang('general.pages.users.delete_confirm_title')</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>
+                                            {{--@lang('general.pages.users.delete_confirm_body_1')
+                                            <strong class="user-name">
+
+                                            </strong>--}}
+                                            {{-- @lang('general.pages.users.delete_confirm_body_2')--}}
+                                            @lang('general.pages.users.delete_confirm_body_3')
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-dark"
+                                                data-dismiss="modal">@lang('labels.no_cancel')</button>
+                                        <form action="{{ route('users.delete', auth()->user()->id) }}" method="post">
+                                            {{ csrf_field() }}
+                                            <input type="hidden" name="_method" value="delete"/>
+                                            <button type="submit" class="btn btn-danger delete-submit"
+                                                    data-todelete="0">@lang('general.pages.users.delete_confirm_submit')</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

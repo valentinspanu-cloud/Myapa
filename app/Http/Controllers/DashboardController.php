@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client as CURL;
+use Illuminate\Http\Request;
+use App\Models\User;
+
+
+class DashboardController extends Controller
+{
+    /**
+     * Create a new controller instance.
+     *
+     *
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws GuzzleException
+     */
+    public function index()
+    {
+        try {
+            $sold = ApiController::getSold() ?: 0;
+        } catch (\Exception $e) {
+            $sold = 0;
+        }
+        return view('dashboard.index', compact('sold'));
+    }
+}
+
+

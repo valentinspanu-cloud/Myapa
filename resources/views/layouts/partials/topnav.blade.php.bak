@@ -1,0 +1,77 @@
+<?php $notifications = getUnreadNotifications(); ?>
+<header>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6">
+                <div class="branding-container">
+                    <a class="navbar-brand" href="{{ route('home') }}">
+                        <img src="{{ asset('img/logo.png') }}" alt="Logo MyApa" class="navbar__logo"/>
+                    </a>
+		    <a class="navbar-brand" href="https://my.aquaservtulcea.ro/" target="_blank">
+                        <img src="{{ asset('img/aqua.png') }}" alt="Logo Aquaserv Tulcea" style="width:140px;" class="navbar__logo"/>
+                    </a>
+                    <div class="button toggle-sidebar">
+                        <i class="fa fa-bars"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <nav class="user-info-nav-outer">
+                    <ul class="nav user-info-nav">
+                        @if(auth()->user()->hasRole('consumer'))
+                            <li class="nav-item dropdown user-info-nav__notificari">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                                   aria-haspopup="true" aria-expanded="false">
+                                    <i class="far fa-bell"></i>
+                                    <span style="position: absolute; font-size: 8px;"
+                                          class="badge badge-pill badge-primary {{ !count($notifications)? 'd-none':'' }}">{{ count($notifications) }}</span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <h4 class="dropdown-header">@lang('general.pages.dashboard.notifications')</h4>
+                                    <ul class="notificari">
+                                        @if(count($notifications))
+                                            @foreach($notifications as $id => $notification)
+                                                @if($id > 4) @continue @endif
+                                                <li class="notificare__item">
+                                                    <div class="notificare__item__icon">
+                                                        <img src="{{ asset('img/icons/nav/sesizari.svg') }}"
+                                                             alt="Iconita Factura"/>
+                                                    </div>
+                                                    <div class="notificare__item__content">
+                                                        <a href="{{ route('notification.view', $notification->id) }}">
+                                                            <p>
+                                                                {{ $notification->subject }}
+                                                            </p></a>
+                                                        <span class="notificare__item__content__date">
+                                                {{ $notification->created_at }}
+                                            </span>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        @endif
+                                    </ul>
+                                    <a class="secondary-link view-all-alerts-link"
+                                       href="{{ route('notification.list') }}">Vezi
+                                        toate notificările</a>
+                                </div>
+                            </li>
+                        @endif
+                        <li class="nav-item user-info-nav__user">
+                            <a class="nav-link" href="{{ !isAdmin() ? route('user.account') : '#' }}">
+                                <span class="user-info-nav__user__name">
+                                    {{ session('personal')['nume'] ?? auth()->user()->name }}
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item d-flex-xy-center">
+                            <a href="{{ route('logout') }}" title="@lang('labels.logout')"
+                               class="hover-to-accent">
+                                <i class="fa fa-sign-out-alt" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
