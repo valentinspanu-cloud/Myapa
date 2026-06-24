@@ -28,6 +28,12 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        if (auth()->user()->hasRole("cititor")) {
+            return redirect("/cititor");
+        }
+        if (auth()->user()->hasRole("supervisor_citiri")) {
+            return redirect("/cititor/supervisor");
+        }
         try {
             $sold = ApiController::getSold() ?: 0;
         } catch (\Exception $e) {

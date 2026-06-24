@@ -49,6 +49,6 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Acces interzis.'], 403);
             }
-            return response()->view('errors.403', [], 403);
+            return response()->view('errors.403', ['exception' => $e], 403);
         });
     })->create();

@@ -1,0 +1,60 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Cititor\CititorController;
+use App\Http\Controllers\Cititor\SupervisorController;
+
+/*
+|--------------------------------------------------------------------------
+| Rute modul cititori contoare
+| Prefix: /cititor
+| Middleware: auth + rol verificat prin permisiuni Spatie
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->prefix('cititor')->name('cititor.')->group(function () {
+
+    // ── Cititor de teren ────────────────────────────────────────────────
+    Route::middleware(['can:cititor.lista'])->group(function () {
+
+        // Dashboard cititor — lista contoare din ruta sa
+        Route::get('/', [CititorController::class, 'index'])
+            ->name('index');
+
+        // Salvare citire (index + poza + GPS)
+        Route::post('/store', [CititorController::class, 'store'])
+            ->name('store')
+            ->middleware('can:cititor.store');
+
+        // Confirmare primire lista (optional — pentru audit)
+        Route::get('/contor/{id_cit}', [CititorController::class, 'show'])
+            ->name('show');
+    });
+
+    // ── Supervisor ──────────────────────────────────────────────────────
+    Route::middleware(['can:supervisor.lista'])->prefix('supervisor')->name('supervisor.')->group(function () {
+
+        // Lista toate citirile (toate rutele, filtru pe status/ruta/luna)
+        Route::get('/', [SupervisorController::class, 'index'])
+            ->name('index');
+
+        // Detaliu citire + poza + GPS
+        Route::get('/{citire}', [SupervisorController::class, 'show'])
+            ->name('show');
+
+        // Confirmare citire (cu posibilitate corectie index)
+        Route::post('/{citire}/confirma', [SupervisorController::class, 'confirma'])
+            ->name('confirma')
+            ->middleware('can:supervisor.confirma');
+
+        // Marcare eroare
+        Route::post('/{citire}/eroare', [SupervisorController::class, 'eroare'])
+            ->name('eroare')
+            ->middleware('can:supervisor.confirma');
+
+        // Export citiri confirmate (Excel)
+        Route::get('/export/{luna}/{an}', [SupervisorController::class, 'export'])
+            ->name('export')
+            ->middleware('can:supervisor.export');
+    });
+});
