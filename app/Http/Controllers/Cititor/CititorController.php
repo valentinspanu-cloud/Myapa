@@ -18,6 +18,33 @@ class CititorController extends Controller
         private CitiriOracleService $oracle
     ) {}
 
+    public function selectieLuna()
+    {
+        $user = Auth::user();
+        if (!$user->ruta) {
+            return view('cititor.no-ruta');
+        }
+
+        $lunaAuto = now()->day >= 21 ? now()->addMonthNoOverflow()->month : now()->month;
+        $anAuto   = now()->day >= 21 ? now()->addMonthNoOverflow()->year  : now()->year;
+
+        // Genereaza ultimele 6 luni + luna curenta de citire
+        $optiuni = [];
+        for ($i = 0; $i <= 5; $i++) {
+            $ref = now()->day >= 21
+                ? now()->addMonthNoOverflow()->subMonths($i)
+                : now()->subMonths($i);
+            $optiuni[] = [
+                'luna'  => $ref->month,
+                'an'    => $ref->year,
+                'label' => $ref->locale('ro')->isoFormat('MMMM YYYY'),
+                'cached' => \Cache::has("contoare_{$user->ruta}_{$ref->month}_{$ref->year}"),
+            ];
+        }
+
+        return view('cititor.selectie-luna', compact('lunaAuto', 'anAuto', 'optiuni'));
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -27,8 +54,19 @@ class CititorController extends Controller
             return view('cititor.no-ruta');
         }
 
-        $luna = now()->month;
-        $an   = now()->year;
+        $lunaAuto = now()->day >= 21 ? now()->addMonthNoOverflow()->month : now()->month;
+        $anAuto   = now()->day >= 21 ? now()->addMonthNoOverflow()->year  : now()->year;
+
+        $luna = (int) request('luna', $lunaAuto);
+        $an   = (int) request('an',   $anAuto);
+
+        // Blocare viitor
+        if ($an > now()->year || ($an == now()->year && $luna > now()->month)) {
+            $luna = $lunaAuto;
+            $an   = $anAuto;
+        }
+
+        $esteLunaHistorica = ($luna !== $lunaAuto || $an !== $anAuto);
 
         // Cache contoare — Laravel Cache (persistent intre sesiuni)
         $cacheKey = "contoare_{$ruta}_{$luna}_{$an}";
@@ -77,6 +115,31 @@ class CititorController extends Controller
             Cache::put($solduriKey, $solduri, now()->addHours(4));
         }
 
+        // Observatii din ultimele 6 luni — indexate dupa cod_abonat
+        // Structura: [cod_abonat => [[luna, an, obs], ...]]
+        $ref6 = now()->day >= 21 ? now()->addMonthNoOverflow() : now();
+        $perioade = [];
+        for ($i = 1; $i <= 6; $i++) {
+            $p = $ref6->copy()->subMonths($i);
+            $perioade[] = ['luna' => $p->month, 'an' => $p->year];
+        }
+        $observatiiAnt = [];
+        foreach ($perioade as $p) {
+            $rows = CitireContor::where('luna', $p['luna'])
+                ->where('an', $p['an'])
+                ->where('ruta', $ruta)
+                ->whereNotNull('observatii')
+                ->where('observatii', '!=', '')
+                ->get(['cod_abonat', 'observatii', 'luna', 'an']);
+            foreach ($rows as $row) {
+                $observatiiAnt[$row->cod_abonat][] = [
+                    'luna'      => $row->luna,
+                    'an'        => $row->an,
+                    'observatii' => $row->observatii,
+                ];
+            }
+        }
+
         // Marcam contoarele cu index deja introdus din alta sursa (nu de noi)
         foreach ($contoare as &$contor) {
             $idCit = $contor['id_cit'];
@@ -86,7 +149,9 @@ class CititorController extends Controller
         unset($contor);
 
         return view('cititor.index', compact(
-            'contoare', 'abonati', 'citate', 'citiriExistente', 'solduri', 'ruta', 'luna', 'an'
+            'contoare', 'abonati', 'citate', 'citiriExistente', 'solduri',
+            'ruta', 'luna', 'an', 'lunaAuto', 'anAuto', 'esteLunaHistorica',
+            'observatiiAnt'
         ));
     }
 

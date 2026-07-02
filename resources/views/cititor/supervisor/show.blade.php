@@ -170,7 +170,7 @@
 @endif
 
 {{-- Inapoi --}}
-<a href="{{ route('cititor.supervisor.index') }}"
+<a href="{{ route('cititor.supervisor.index', ['luna' => $citire->luna, 'an' => $citire->an]) }}"
     class="mt-4 flex items-center gap-2 text-[#1e3a5f] text-sm font-medium py-2">
     ← Înapoi la lista
 </a>

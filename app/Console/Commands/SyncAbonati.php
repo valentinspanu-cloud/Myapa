@@ -19,7 +19,8 @@ class SyncAbonati extends Command
 
     public function handle(): int
     {
-        $luna       = now()->month;
+        $luna = now()->day >= 21 ? now()->addMonthNoOverflow()->month : now()->month;
+        $an   = now()->day >= 21 ? now()->addMonthNoOverflow()->year  : now()->year;
         $an         = now()->year;
         $rutaFilter = $this->option('ruta');
 

@@ -2,7 +2,36 @@
 @section('title', 'Lista Contoare')
 @section('header_title', 'Ruta: ' . $ruta)
 
+@section('luna_header')
+<form method="GET" action="{{ route('cititor.index') }}" class="flex items-center gap-1">
+    <select name="luna" onchange="this.form.submit()"
+        class="bg-[#2d5a8e] text-white text-xs rounded px-1.5 py-0.5 border border-blue-400 focus:outline-none">
+        @for ($m = 1; $m <= 12; $m++)
+            <option value="{{ $m }}" {{ $luna == $m ? 'selected' : '' }}>
+                {{ \Carbon\Carbon::create(null, $m)->locale('ro')->isoFormat('MMM') }}
+            </option>
+        @endfor
+    </select>
+    <select name="an" onchange="this.form.submit()"
+        class="bg-[#2d5a8e] text-white text-xs rounded px-1.5 py-0.5 border border-blue-400 focus:outline-none">
+        @for ($y = now()->year; $y >= now()->year - 2; $y--)
+            <option value="{{ $y }}" {{ $an == $y ? 'selected' : '' }}>{{ $y }}</option>
+        @endfor
+    </select>
+    <input type="hidden" name="filtru" value="{{ request('filtru', 'toate') }}">
+    <input type="hidden" name="q" value="{{ request('q') }}">
+</form>
+@endsection
+
 @section('search')
+{{-- Banner luna istorica --}}
+@if($esteLunaHistorica)
+<div class="bg-amber-50 border-b border-amber-300 text-amber-800 px-4 py-2 flex items-center justify-between text-sm">
+    <span>⚠️ Vizualizezi <strong>{{ \Carbon\Carbon::create($an, $luna)->locale('ro')->isoFormat('MMMM YYYY') }}</strong> — lună istorică</span>
+    <a href="{{ route('cititor.index') }}" class="underline font-medium">← Luna curentă</a>
+</div>
+@endif
+
 {{-- Statistici sticky --}}
 <div class="sticky top-[56px] z-40 bg-[#1e3a5f] text-white px-4 py-2 shadow-md">
     <div class="flex items-center justify-between">
@@ -62,12 +91,16 @@
             <option value="citite"   {{ request('filtru') == 'citite'   ? 'selected' : '' }}>Citite</option>
             <option value="altundeva" {{ request('filtru') == 'altundeva' ? 'selected' : '' }}>Are deja citire!</option>
         </select>
+        <input type="hidden" name="luna" value="{{ $luna }}">
+        <input type="hidden" name="an" value="{{ $an }}">
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 text-sm">
             ↵
         </button>
     </form>
 </div>
 @endsection
+
+
 
 @section('content')
 
@@ -183,6 +216,54 @@
                 <div>Cod: <span class="font-mono font-medium text-gray-700">{{ $contor['cod_abonat'] }}</span></div>
                 <div>Serie: <span class="font-mono font-medium text-gray-700">{{ $contor['serie_contor'] }}</span></div>
             </div>
+            {{-- Provenienta citire --}}
+            <div class="px-4 py-2 border-b border-gray-100 text-xs">
+                @php
+                    $provMap = [
+                        1  => ['label' => 'Apometru',           'icon' => '💧', 'cls' => 'bg-blue-100 text-blue-700'],
+                        2  => ['label' => 'Pausal',             'icon' => '📋', 'cls' => 'bg-gray-100 text-gray-600'],
+                        3  => ['label' => 'Citire teren',       'icon' => '👤', 'cls' => 'bg-blue-100 text-blue-700'],
+                        4  => ['label' => 'Consum cf. P-V',     'icon' => '📄', 'cls' => 'bg-gray-100 text-gray-600'],
+                        6  => ['label' => 'Transcriere',        'icon' => '✏️', 'cls' => 'bg-gray-100 text-gray-600'],
+                        7  => ['label' => 'Schimb contor',      'icon' => '🔧', 'cls' => 'bg-orange-100 text-orange-700'],
+                        8  => ['label' => 'Estimare',           'icon' => '📊', 'cls' => 'bg-yellow-100 text-yellow-700'],
+                        9  => ['label' => 'Reglare consum',     'icon' => '⚙️', 'cls' => 'bg-yellow-100 text-yellow-700'],
+                        10 => ['label' => 'Blindat',            'icon' => '🔒', 'cls' => 'bg-red-100 text-red-700'],
+                        12 => ['label' => 'Avans',              'icon' => '💰', 'cls' => 'bg-gray-100 text-gray-600'],
+                        13 => ['label' => 'Plecat',             'icon' => '🚪', 'cls' => 'bg-gray-100 text-gray-600'],
+                        14 => ['label' => 'Grădină',            'icon' => '🌿', 'cls' => 'bg-green-100 text-green-700'],
+                        15 => ['label' => 'Citire telefonică',  'icon' => '📞', 'cls' => 'bg-purple-100 text-purple-700'],
+                        16 => ['label' => 'Regularizare',       'icon' => '🔄', 'cls' => 'bg-gray-100 text-gray-600'],
+                        17 => ['label' => 'Portal MyAPA',       'icon' => '🌐', 'cls' => 'bg-indigo-100 text-indigo-700'],
+                        18 => ['label' => 'Ajustare consum',    'icon' => '⚖️', 'cls' => 'bg-yellow-100 text-yellow-700'],
+                        21 => ['label' => 'Citire radio',       'icon' => '📡', 'cls' => 'bg-teal-100 text-teal-700'],
+                        22 => ['label' => 'Autocitire',         'icon' => '📱', 'cls' => 'bg-green-100 text-green-700'],
+                    ];
+                    $idProv  = $contor['id_provenienta'] ?? null;
+                    $provInfo = $idProv ? ($provMap[$idProv] ?? ['label' => 'Proveniență #'.$idProv, 'icon' => '❓', 'cls' => 'bg-gray-100 text-gray-500']) : null;
+                @endphp
+                @if($contor['index_nou'] && $provInfo)
+                    <span class="inline-flex items-center gap-1 {{ $provInfo['cls'] }} px-2 py-0.5 rounded-full">
+                        {{ $provInfo['icon'] }} {{ $provInfo['label'] }}
+                    </span>
+                @elseif(!$contor['index_nou'])
+                    <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">⬜ Necitit</span>
+                @endif
+            </div>
+            {{-- Observatie luna anterioara --}}
+            @if(isset($observatiiAnt[$contor['cod_abonat']]))
+            <div class="px-4 py-2 border-b border-amber-100 bg-amber-50">
+                <div class="text-xs text-amber-600 font-medium mb-1">📝 Observații anterioare:</div>
+                @foreach($observatiiAnt[$contor['cod_abonat']] as $obs)
+                <div class="flex items-start gap-2 text-sm text-amber-800 mb-1">
+                    <span class="text-xs text-amber-500 whitespace-nowrap font-medium">
+                        {{ \Carbon\Carbon::create($obs['an'], $obs['luna'])->locale('ro')->isoFormat('MMM YYYY') }}
+                    </span>
+                    <span>{{ $obs['observatii'] }}</span>
+                </div>
+                @endforeach
+            </div>
+            @endif
 
             {{-- Formular citire noua --}}
             <div class="form-necitit px-4 py-3 space-y-3">
@@ -241,6 +322,7 @@
 
                     <input type="text" name="observatii" maxlength="500"
                         placeholder="Observații (opțional)"
+                        value="{{ isset($observatiiAnt[$contor['cod_abonat']]) ? $observatiiAnt[$contor['cod_abonat']][0]['observatii'] : '' }}"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e3a5f]">
 
                     <div class="text-xs text-gray-400 gps-status">📍 Locație: în așteptare...</div>
@@ -269,7 +351,7 @@
                     <div class="text-xs text-orange-600 respins-motiv"></div>
                 </div>
                 <div class="foto-container hidden mb-3">
-                    <img class="foto-img w-full rounded-lg object-cover max-h-48" src="" alt="Poză contor">
+                    <img class="foto-img w-full rounded-lg object-contain max-h-64 bg-gray-50" src="" alt="Poză contor">
                 </div>
                 <a href="#" class="edit-link block w-full text-center border border-[#1e3a5f] text-[#1e3a5f] font-semibold py-2 rounded-xl text-sm hover:bg-gray-50">
                     Editează citirea
@@ -448,6 +530,15 @@ function incarcaDetaliu(card, idClient, idCit, dejaAltundeva = false) {
             }
             if (data.citire_id) {
                 card.querySelector('.edit-link').href = `${EDIT_URL}/${data.citire_id}`;
+            }
+            // Afisam poza daca exista
+            if (data.foto_path) {
+                const fotoContainer = card.querySelector('.foto-container');
+                const fotoImg = card.querySelector('.foto-img');
+                const fotoRoute = "{{ url('cititor/foto') }}";
+                const cale = data.foto_path.replace('citiri/', '');
+                fotoImg.src = `${fotoRoute}/${cale}`;
+                fotoContainer.classList.remove('hidden');
             }
         } else {
             // Necitit — afisam formular

@@ -12,7 +12,7 @@ Route::get('/', function () {
             return redirect('/cititor/supervisor');
         }
         if (auth()->user()->hasRole('cititor')) {
-            return redirect('/cititor');
+            return redirect('/cititor/selectie-luna');
         }
     }
     return redirect('/login');

@@ -23,8 +23,8 @@ class SupervisorController extends Controller
 
     public function index(Request $request)
     {
-        $luna   = $request->get('luna', now()->month);
-        $an     = $request->get('an', now()->year);
+        $luna   = $request->get('luna', now()->day >= 21 ? now()->addMonthNoOverflow()->month : now()->month);
+        $an     = $request->get('an', now()->day >= 21 ? now()->addMonthNoOverflow()->year : now()->year);
         $ruta   = $request->get('ruta');
         $status = $request->get('status');
 
@@ -95,8 +95,8 @@ class SupervisorController extends Controller
 
     public function harta(Request $request)
     {
-        $luna = $request->get('luna', now()->month);
-        $an   = $request->get('an', now()->year);
+        $luna = $request->get('luna', now()->day >= 21 ? now()->addMonthNoOverflow()->month : now()->month);
+        $an   = $request->get('an', now()->day >= 21 ? now()->addMonthNoOverflow()->year : now()->year);
         $ruteSelectate = $request->get('ruta', []);
         if (!is_array($ruteSelectate)) $ruteSelectate = $ruteSelectate ? [$ruteSelectate] : [];
 
@@ -284,8 +284,8 @@ class SupervisorController extends Controller
 
     public function statistici(Request $request)
     {
-        $luna = $request->get('luna', now()->month);
-        $an   = $request->get('an', now()->year);
+        $luna = $request->get('luna', now()->day >= 21 ? now()->addMonthNoOverflow()->month : now()->month);
+        $an   = $request->get('an', now()->day >= 21 ? now()->addMonthNoOverflow()->year : now()->year);
 
         $cititoriPerRuta = User::role('cititor')->whereNotNull('ruta')->where('name', 'NOT LIKE', 'Cititor %')->pluck('name', 'ruta');
         $ruteActive = RutaCitire::active()->orderBy('nume')->get();

@@ -36,6 +36,11 @@ class LoginController extends Controller
             return redirect()->route('home');
         }
 
+        // Cititori de teren → selectie luna
+        if ($user->hasRole('cititor')) {
+            return redirect()->route('cititor.selectie-luna');
+        }
+
         $firstCode = $user->codes()->first();
         if (!$firstCode) {
             return redirect()->route('home');

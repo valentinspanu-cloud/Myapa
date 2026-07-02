@@ -39,7 +39,12 @@
             </svg>
             <div>
                 <div class="font-semibold text-sm leading-tight">@yield('header_title', 'Cititor Contoare')</div>
-                <div class="text-xs text-blue-200">{{ Auth::user()->name }}</div>
+                <div class="text-xs text-blue-200 flex items-center gap-2">
+                    <span>{{ Auth::user()->name }}</span>
+                    @hasSection('luna_header')
+                        @yield('luna_header')
+                    @endif
+                </div>
             </div>
         </div>
         <form method="POST" action="{{ route('logout') }}">

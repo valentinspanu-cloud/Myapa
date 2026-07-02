@@ -15,7 +15,7 @@ class TrustProxies extends Middleware
      *
      * @var array|string|null
      */
-    protected $proxies;
+    protected $proxies = '*';
 
     /**
      * Header-ele folosite pentru detectarea proxy-urilor.

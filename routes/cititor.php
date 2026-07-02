@@ -8,6 +8,7 @@ use App\Http\Controllers\Cititor\SupervisorRuteController;
 
 Route::middleware(['auth'])->prefix('cititor')->name('cititor.')->group(function () {
 
+    Route::get('/selectie-luna', [CititorController::class, 'selectieLuna'])->name('selectie-luna')->middleware('permission:cititor.lista');
     Route::get('/', [CititorController::class, 'index'])->name('index')->middleware('permission:cititor.lista');
     Route::post('/store', [CititorController::class, 'store'])->name('store')->middleware('permission:cititor.store');
     Route::get('/contor/{id_cit}', [CititorController::class, 'show'])->name('show')->middleware('permission:cititor.lista');
@@ -25,6 +26,8 @@ Route::middleware(['auth'])->prefix('cititor')->name('cititor.')->group(function
             Route::get('/', [SupervisorRuteController::class, 'index'])->name('index');
             Route::post('/sync', [SupervisorRuteController::class, 'sync'])->name('sync');
             Route::post('/sync-contoare', [SupervisorRuteController::class, 'syncContoare'])->name('sync-contoare');
+            Route::post('/sync-contoare-async', [SupervisorRuteController::class, 'syncContoareAsync'])->name('sync-contoare-async');
+            Route::get('/sync-status', [SupervisorRuteController::class, 'syncStatus'])->name('sync-status');
             Route::post('/', [SupervisorRuteController::class, 'store'])->name('store');
             Route::post('/{ruta}/toggle', [SupervisorRuteController::class, 'toggleActiva'])->name('toggle');
         });
